@@ -95,7 +95,7 @@ exports.update_post = [
       isPublic: req.body.isPublic,
       timestamp: new Date(),
       comments: post.comments, 
-      _id: post.id, 
+      _id: req.params.postid, 
     });
 
     if (!errors.isEmpty()) {

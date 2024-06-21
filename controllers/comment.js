@@ -4,6 +4,7 @@ const { body, validationResult } = require('express-validator');
 
 const Comment = require('../models/comment');
 const Post = require('../models/post');
+const User = require('../models/user');
 
 exports.get_comments_in_post = asyncHandler(async (req, res, next) => {
   const post = await Post.findById(req.params.postid).exec();
@@ -18,7 +19,7 @@ exports.get_comments_in_post = asyncHandler(async (req, res, next) => {
   res.send(comments);
 });
 
-const get_comment_by_id = asyncHandler(async (req, res, next) => {
+exports.get_comment_by_id = asyncHandler(async (req, res, next) => {
   const comment = await Comment.findById(req.params.commentid).exec();
 
   if (comment === null) {
@@ -34,13 +35,21 @@ exports.create_comment = [
     .trim()
     .isLength({min: 1, max: 280})
     .escape(),
-  body('author', 'An author must be specified')
-    .exists(),
+  body('author')
+    .exists()
+    .withMessage('An author must be specified')
+    .custom(async authorid => {
+      const author = await User.findById(authorid).exec();
+
+      if (author === null) {
+        throw new Error('The author does not exist in the database.');
+      }
+    }),
   
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
 
-    const post = await Post.findById(req.params.id).exec();
+    const post = await Post.findById(req.params.postid).exec();
 
     if (post === null) {
       res.status(404).send({message: 'Post not found'});
@@ -63,7 +72,7 @@ exports.create_comment = [
       comments: [...post.comments, comment.id],
     });
 
-    res.send(comment);
+    res.json(comment);
   }),
 ];
 
@@ -86,7 +95,7 @@ exports.update_comment = [
     }
 
     const newComment = new Comment({
-      _id: comment.id,
+      _id: req.params.commentid,
       body: req.body.body,
       author: req.body.author,
       timestamp: new Date(),
@@ -97,7 +106,7 @@ exports.update_comment = [
       return;
     }
 
-    const updatedComment = await Comment.findByIdAndUpdate(comment.id, newComment).exec();
+    const updatedComment = await Comment.findByIdAndUpdate(req.params.commentid, newComment).exec();
     res.send(updatedComment);
   }),
 ];
@@ -110,7 +119,7 @@ exports.delete_comment = asyncHandler(async(req, res, next) => {
     return;
   }
 
-  await Comment.findByIdAndDelete(comment.id).exec();
+  await Comment.findByIdAndDelete(req.params.commentid).exec();
 
   res.send({message: 'The comment has been deleted'});
 });
