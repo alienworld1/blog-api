@@ -52,7 +52,7 @@ exports.admin_login = asyncHandler(async (req, res, next) => {
     return res.status(403).json({message: 'This user is not authorized to view this resource.'});
   }
 
-  const verifyPassword = await bcrypt.hash(req.body.password, user.password);
+  const verifyPassword = await bcrypt.compare(req.body.password, user.password);
 
   if (!verifyPassword) {
     return res.status(401).json({message: 'Incorrect password.'});

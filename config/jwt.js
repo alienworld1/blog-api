@@ -10,15 +10,16 @@ const jwtOptions = {
 };
 
 passport.use(new JwtStrategy(jwtOptions, async (jwt_payload, done) => {
-  const user = await User.findById(jwt_payload.sub);
-  if (err) {
+  try {
+    console.log(jwt_payload);
+    const user = await User.findById(jwt_payload.id);
+    if (user) {
+      return done(null, user);
+    } else {
+      return done(null, false);
+    }  
+  } catch (err) {
     return done(err, false);
-  }
-
-  if (user) {
-    return done(null, user);
-  } else {
-    return done(null, false);
   }
 }));
 

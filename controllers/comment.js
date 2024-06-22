@@ -35,16 +35,6 @@ exports.create_comment = [
     .trim()
     .isLength({min: 1, max: 280})
     .escape(),
-  body('author')
-    .exists()
-    .withMessage('An author must be specified')
-    .custom(async authorid => {
-      const author = await User.findById(authorid).exec();
-
-      if (author === null) {
-        throw new Error('The author does not exist in the database.');
-      }
-    }),
   
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
@@ -58,7 +48,7 @@ exports.create_comment = [
 
     const comment = new Comment({
       body: req.body.body,
-      author: req.body.author,
+      author: req.user.id,
       timestamp: new Date(),
     });
 
@@ -68,7 +58,7 @@ exports.create_comment = [
     }
 
     await comment.save();
-    await Post.findByIdAndUpdate(post.id, {
+    await Post.findByIdAndUpdate(req.params.postid, {
       comments: [...post.comments, comment.id],
     });
 
@@ -81,8 +71,6 @@ exports.update_comment = [
     .trim()
     .isLength({min: 1, max: 280})
     .escape(),
-  body('author', 'An author must be specified')
-    .exists(),
   
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
@@ -97,7 +85,7 @@ exports.update_comment = [
     const newComment = new Comment({
       _id: req.params.commentid,
       body: req.body.body,
-      author: req.body.author,
+      author: req.user.id,
       timestamp: new Date(),
     });
 

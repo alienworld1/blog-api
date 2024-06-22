@@ -81,8 +81,9 @@ app.use((req, res, next) => next(createError(404)));
 
 app.use((err, req, res, next) => {
   const error = req.app.get('env') === 'development' ? err: {};
-  res.json({
-    status: err.status || 500,
+  const status = err.status || 500;
+  res.status(status).json({
+    status,
     message: err.message,
     error: err,
   });
