@@ -4,17 +4,17 @@ const { body, validationResult } = require('express-validator');
 const Post = require('../models/post');
 
 exports.get_all_posts = asyncHandler(async (req, res, next) => {
-  const posts = await Post.find().sort({timestamp: -1}).exec();
+  const posts = await Post.find({}, {comments: 0}).sort({timestamp: -1}).exec();
   res.send(posts ?? {});
 });
 
 exports.get_all_public_posts = asyncHandler(async (req, res, next) => {
-  const posts = await Post.find({isPublic: true}).sort({timestamp: -1}).exec();
+  const posts = await Post.find({isPublic: true}, {comments: 0}).sort({timestamp: -1}).exec();
   res.send(posts ?? {});
 });
 
 exports.get_all_private_posts = asyncHandler(async (req, res, next) => {
-  const posts = await Post.find({isPublic: false}).sort({timestamp: -1}).exec();
+  const posts = await Post.find({isPublic: false}, {comments: 0}).sort({timestamp: -1}).exec();
   res.send(posts ?? {});
 });
 
