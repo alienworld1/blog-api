@@ -20,7 +20,7 @@ exports.get_comments_in_post = asyncHandler(async (req, res, next) => {
 });
 
 exports.get_comment_by_id = asyncHandler(async (req, res, next) => {
-  const comment = await Comment.findById(req.params.commentid).exec();
+  const comment = await Comment.findById(req.params.commentid).populate({path: 'author', select: 'username'}).exec();
 
   if (comment === null) {
     res.status(404).send({message: 'Comment not found'});
