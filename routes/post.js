@@ -4,9 +4,9 @@ const postController = require('../controllers/post');
 const commentController = require('../controllers/comment');
 const { userIsLoggedIn, userIsAdmin } = require('../middleware/auth');
 
-router.get('/', postController.get_all_posts);
+router.get('/', userIsAdmin, postController.get_all_posts);
 router.get('/public', postController.get_all_public_posts);
-router.get('/private', postController.get_all_private_posts);
+router.get('/private', userIsAdmin, postController.get_all_private_posts);
 
 router.get('/:postid', postController.get_post_by_id);
 
