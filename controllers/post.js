@@ -101,7 +101,7 @@ exports.update_post = [
     if (!errors.isEmpty()) {
       res.status(400).send(errors.array());
     } else {
-      await newPost.save();
+      await Post.findByIdAndUpdate(req.params.postid, newPost).exec();
       res.send(newPost);
     }
   }),

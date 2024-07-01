@@ -6,6 +6,10 @@ const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const bcrypt = require('bcryptjs');
+const helmet = require('helmet');
+const compression = require('compression');
+const RateLimit = require('express-rate-limit');
+const cors = require('cors');
 
 require('dotenv').config();
 
@@ -75,6 +79,14 @@ require('./config/jwt');
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
+app.use(cors());
+app.use(helmet());
+app.use(RateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+}));
+app.use(compression());
+
 app.use('/api', indexRouter);
 
 app.use((req, res, next) => next(createError(404)));
@@ -85,7 +97,7 @@ app.use((err, req, res, next) => {
   res.status(status).json({
     status,
     message: err.message,
-    error: err,
+    error,
   });
 });
 
