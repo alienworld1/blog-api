@@ -21,7 +21,7 @@ router.get('/comments/:commentid', commentController.get_comment_by_id);
 
 router.post('/:postid/comments', userIsLoggedIn, commentController.create_comment);
 
-router.put('/comments/:commentid', userIsLoggedIn, commentController.update_comment);
-router.delete('/comments/:commentid', userIsLoggedIn, commentController.delete_comment);
+router.put('/comments/:commentid', userIsAdmin, commentController.update_comment);
+router.delete('/comments/:commentid', userIsAdmin, commentController.delete_comment);
 
 module.exports = router;
